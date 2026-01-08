@@ -10,35 +10,78 @@ function App() {
   function addTodo() {
     if (!task.trim()) return;
 
-    setTodos([...todos, task]);
+    setTodos([
+      ...todos,
+      {
+        id: Date.now(),
+        text: task,
+        completed: false,
+        isEditing: false,
+      },
+    ]);
+
     setTask("");
+  }
+
+  function deleteTodo(id) {
+    setTodos(todos.filter((todo) => todo.id !== id));
+  }
+
+  function editTodo(id) {
+    setTodos(
+      todos.map((todo) =>
+        todo.id === id ? { ...todo, isEditing: !todo.isEditing } : todo
+      )
+    );
+  }
+  function saveTodo(id, newText) {
+    setTodos(
+      todos.map((todo) =>
+        todo.id === id ? { ...todo, text: newText, isEditing: false } : todo
+      )
+    );
+  }
+
+  function toggleTodo(id) {
+    setTodos(
+      todos.map((todo) =>
+        todo.id === id ? { ...todo, completed: !todo.completed } : todo
+      )
+    );
   }
 
   return (
     <>
-      <div className="flex justify-center items-center w-full h-screen">
-        <div className="w-160 max-w-full rounded-xl">
+      <div className="flex justify-center items-center w-full h-screen bg-gray-900 text-white">
+        <div className="w-[40rem] max-w-full bg-gray-800 rounded-xl shadow-lg text-center p-4">
           <Header />
           <div>
-            <div className="bg-purple-400 w-full flex justify-center p-4 text-xl">
+            <div className="w-full flex justify-center gap-3 p-4 text-xl bg-gray-700">
               <input
                 type="text"
                 value={task}
+                placeholder="Add a new Task....."
                 onChange={(e) => setTask(e.target.value)}
-                className="border-2"
+                className="px-2 py-2 rounded-lg bg-gray-600 text-white outline-none focus:ring-2 focus:ring-purple-400"
                 onKeyDown={(e) => {
-                  if(e.key === "Enter") addTodo();
+                  e.key === "Enter" && addTodo();
                 }}
               />
               <button
-                className="border-2 bg-blue-400 rounded-md p-2"
+                className="bg-purple-500 rounded-md px-3 py-3"
                 onClick={addTodo}
               >
                 Add
               </button>
             </div>
           </div>
-          <TodoList taskData={todos} />
+          <TodoList
+            taskData={todos}
+            onDelete={deleteTodo}
+            onToggle={toggleTodo}
+            onEdit={editTodo}
+            onSave={saveTodo}
+          />
         </div>
       </div>
     </>
